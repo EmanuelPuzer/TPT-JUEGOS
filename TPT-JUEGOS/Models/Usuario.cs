@@ -10,7 +10,7 @@ namespace TPT_JUEGOS.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
-
+        public int Id { get; set; }
         [Display(Name = "Nombre completo")]
         public string NOMBRE_PERSONA { get; set; }
         [Display(Name = "Edad")]
