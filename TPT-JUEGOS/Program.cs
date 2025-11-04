@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using TPT_JUEGOS.Context;
+
 namespace TPT_JUEGOS
 {
     public class Program
@@ -5,6 +8,11 @@ namespace TPT_JUEGOS
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddDbContext<Context.UsuariosDatabaseContext>(
+            options =>
+            options.UseSqlServer(builder.Configuration["ConnectionString:TPTJUEGOSSTRINGConnection"]));
+
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
