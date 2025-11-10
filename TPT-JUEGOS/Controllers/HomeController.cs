@@ -18,7 +18,7 @@ namespace TPT_JUEGOS.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult InicioSesion()
         {
             return View();
         }
