@@ -5,7 +5,7 @@
 namespace TPT_JUEGOS.Migrations
 {
     /// <inheritdoc />
-    public partial class crearDB : Migration
+    public partial class BaseDatos : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,7 +14,9 @@ namespace TPT_JUEGOS.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    NOMBRE_PERSONA = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NOMBRE_PERSONA = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EDAD_USUARIO = table.Column<int>(type: "int", nullable: false),
                     NOMBRE_USUARIO = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CORREO_USUARIO = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -22,7 +24,7 @@ namespace TPT_JUEGOS.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Usuarios", x => x.NOMBRE_PERSONA);
+                    table.PrimaryKey("PK_Usuarios", x => x.Id);
                 });
         }
 

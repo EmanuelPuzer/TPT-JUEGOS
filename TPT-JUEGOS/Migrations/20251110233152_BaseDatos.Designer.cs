@@ -11,8 +11,8 @@ using TPT_JUEGOS.Context;
 namespace TPT_JUEGOS.Migrations
 {
     [DbContext(typeof(UsuariosDatabaseContext))]
-    [Migration("20251104011726_crearDB")]
-    partial class crearDB
+    [Migration("20251110233152_BaseDatos")]
+    partial class BaseDatos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,9 +26,11 @@ namespace TPT_JUEGOS.Migrations
 
             modelBuilder.Entity("TPT_JUEGOS.Models.Usuario", b =>
                 {
-                    b.Property<string>("NOMBRE_PERSONA")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CONTRASENA_USUARIO")
                         .HasColumnType("int");
@@ -40,11 +42,15 @@ namespace TPT_JUEGOS.Migrations
                     b.Property<int>("EDAD_USUARIO")
                         .HasColumnType("int");
 
+                    b.Property<string>("NOMBRE_PERSONA")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NOMBRE_USUARIO")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("NOMBRE_PERSONA");
+                    b.HasKey("Id");
 
                     b.ToTable("Usuarios");
                 });
