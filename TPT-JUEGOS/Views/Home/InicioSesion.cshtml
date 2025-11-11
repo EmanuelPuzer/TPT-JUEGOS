@@ -1,7 +1,42 @@
-﻿
+﻿@model TPT_JUEGOS.Models.LoginViewModel
 @{
-    ViewData["Title"] = "InicioSesion";
+    ViewData["Title"] = "Inicio de Sesión";
 }
 
-<h1>InicioSesion</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
 
+    <h1>Login</h1>
+
+    <form asp-controller="Home" asp-action="InicioSesion" method="post">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div>
+            <label asp-for="UsuarioOEmail"></label>
+            <br />
+            <input asp-for="UsuarioOEmail" placeholder="Ingrese su usuario o email" />
+            <br />
+            <span asp-validation-for="UsuarioOEmail" class="text-danger"></span>
+        </div>
+        <br />
+        <div>
+            <label asp-for="Contrasena"></label>
+            <br />
+            <input asp-for="Contrasena" placeholder="Ingrese su clave" />
+            <br />
+            <span asp-validation-for="Contrasena" class="text-danger"></span>
+        </div>
+        <br />
+
+        <br />
+        <input type="submit" value="ENVIAR" />
+    </form>
+
+</body>
+</html>

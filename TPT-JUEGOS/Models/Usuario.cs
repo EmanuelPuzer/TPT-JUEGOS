@@ -20,6 +20,6 @@ namespace TPT_JUEGOS.Models
         [Display(Name = "Correo electronico")]
         public string CORREO_USUARIO { get; set; }
         [Display(Name = "Contraseña")]
-        public int CONTRASENA_USUARIO { get; set; }
+        public string CONTRASENA_USUARIO { get; set; }
     }
 }
