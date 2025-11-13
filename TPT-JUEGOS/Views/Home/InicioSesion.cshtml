@@ -1,33 +1,42 @@
-﻿
-@{
-    ViewData["Title"] = "InicioSesion";
+﻿@{
+    ViewData["Title"] = "Inicio de Sesión";
 }
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="utf-8">
-	<title>Log In</title>
+    <meta charset="utf-8">
+    <title>Login</title>
 </head>
-
 <body>
 
-	<form action="ValidarLogin.aspx" method="post">
-		<h1> Login </h1>
+    <div style="text-align:center; margin-top: 50px;">
+        <h1>Iniciar Sesión</h1>
 
-		<label for="miemail"> Mail: </label>
-		<input type="email" id="miemail" name="correoelectronico" placeholder="Ingrese su email">
-		<br><br>
-		<label for="pass">Pass: </label>
-		<input type="password" id="pass" name="password" placeholder="su clave" required>
-		<br><br>
-		<label for="verif">Acepta Terminos y Condiciones</label>
-		<input type="checkbox" id="verif">
-		<br><br>
+        <form action="/Home/InicioSesion" method="post">
 
-		<input type="submit" value="ENVIAR">
-	</form>
+            <div style="margin-bottom: 15px;">
+                <label>Usuario o Email:</label><br>
+                <input type="text" name="NOMBRE_USUARIO" placeholder="Ingrese usuario o email" required />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label>Contraseña:</label><br>
+                <input type="password" name="CONTRASENA_USUARIO" placeholder="Ingrese su clave" required />
+            </div>
+
+            <input type="submit" value="INGRESAR" style="padding: 10px 20px; cursor: pointer;" />
+        </form>
+
+        @if (ViewData["MensajeError"] != null)
+        {
+            <div style="color: red; margin-top: 20px; font-weight: bold;">
+                @ViewData["MensajeError"]
+            </div>
+        }
+
+    </div>
 
 </body>
-
 </html>
 
