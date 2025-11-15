@@ -18,6 +18,10 @@ namespace TPT_JUEGOS.Controllers
             _context = context;
         }
 
+        public IActionResult IndexBienvenida()
+            {
+            return View();
+        }
         public IActionResult Index()
         {
             return View();
