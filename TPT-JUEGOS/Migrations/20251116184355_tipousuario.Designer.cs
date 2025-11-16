@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TPT_JUEGOS.Context;
 
@@ -10,9 +11,11 @@ using TPT_JUEGOS.Context;
 namespace TPT_JUEGOS.Migrations
 {
     [DbContext(typeof(UsuariosDatabaseContext))]
-    partial class UsuariosDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251116184355_tipousuario")]
+    partial class tipousuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
