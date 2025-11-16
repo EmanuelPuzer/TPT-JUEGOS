@@ -1,0 +1,36 @@
+﻿@model TPT_JUEGOS.Models.Juego
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Juego</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NOMBRE_JUEGO)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NOMBRE_JUEGO)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JUEGO_ACTIVO)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JUEGO_ACTIVO)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CODIGO_JUEGO)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CODIGO_JUEGO)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id_JUEGO">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<TPT_JUEGOS.Models.Juego>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NOMBRE_JUEGO)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JUEGO_ACTIVO)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CODIGO_JUEGO)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NOMBRE_JUEGO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JUEGO_ACTIVO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CODIGO_JUEGO)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id_JUEGO">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id_JUEGO">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id_JUEGO">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -9,9 +9,11 @@ namespace TPT_JUEGOS
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<Context.UsuariosDatabaseContext>(
-            options =>
-            options.UseSqlServer(builder.Configuration["ConnectionString:TPTJUEGOSSTRINGConnection"]));
+            builder.Services.AddDbContext<Context.UsuariosDatabaseContext>(options =>options.UseSqlServer(builder.Configuration["ConnectionString:TPTJUEGOSSTRINGConnection"]));
+
+            builder.Services.AddDbContext<JuegoDatabaseContext>(options =>options.UseSqlServer(builder.Configuration["ConnectionString:TPTJUEGOSSTRINGConnection"]));
+
+
 
 
             // Add services to the container.

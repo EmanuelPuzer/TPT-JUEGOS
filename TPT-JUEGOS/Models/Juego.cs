@@ -17,7 +17,7 @@ namespace TPT_JUEGOS.Models
         public int  JUEGO_ACTIVO { get; set; }
  
         [Display(Name = "Codigo Juego")]
-        public int CODIGO_JUEGO { get; set; }
+        public string CODIGO_JUEGO { get; set; }
 
     }
 }

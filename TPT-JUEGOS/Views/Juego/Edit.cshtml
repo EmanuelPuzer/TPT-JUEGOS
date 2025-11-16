@@ -1,0 +1,41 @@
+﻿@model TPT_JUEGOS.Models.Juego
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Juego</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id_JUEGO" />
+            <div class="form-group">
+                <label asp-for="NOMBRE_JUEGO" class="control-label"></label>
+                <input asp-for="NOMBRE_JUEGO" class="form-control" />
+                <span asp-validation-for="NOMBRE_JUEGO" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="JUEGO_ACTIVO" class="control-label"></label>
+                <input asp-for="JUEGO_ACTIVO" class="form-control" />
+                <span asp-validation-for="JUEGO_ACTIVO" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CODIGO_JUEGO" class="control-label"></label>
+                <input asp-for="CODIGO_JUEGO" class="form-control" />
+                <span asp-validation-for="CODIGO_JUEGO" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
