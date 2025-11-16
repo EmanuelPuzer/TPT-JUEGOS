@@ -21,5 +21,9 @@ namespace TPT_JUEGOS.Models
         public string CORREO_USUARIO { get; set; }
         [Display(Name = "Contraseña")]
         public string CONTRASENA_USUARIO { get; set; }
+
+        // 0= Usuario normal 1= Administrador
+        public int TIPO_USUARIO { get; set; }
+
     }
 }
