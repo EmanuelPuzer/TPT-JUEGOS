@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="~/TPT_JUEGOS.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    @if (ViewData["OcultarNavbar"] == null)
+    {
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TPT_JUEGOS</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -23,10 +25,10 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuario" asp-action="Index">Usuario</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuario" asp-action="Index">Mi cuenta</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="InicioSesion">InicioSesion</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CerrarSesion">Cerrar Sesion</a>
                         </li>
                       
 
@@ -35,6 +37,7 @@
             </div>
         </nav>
     </header>
+    }
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()

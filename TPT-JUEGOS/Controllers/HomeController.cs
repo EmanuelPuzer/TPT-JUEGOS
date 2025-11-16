@@ -20,6 +20,7 @@ namespace TPT_JUEGOS.Controllers
 
         public IActionResult IndexBienvenida()
             {
+            ViewData["OcultarNavbar"] = true;
             return View();
         }
         public IActionResult Index()
@@ -30,10 +31,22 @@ namespace TPT_JUEGOS.Controllers
         
         public IActionResult InicioSesion()
         {
+            ViewData["OcultarNavbar"] = true;
             return View();
         }
 
-        
+        public HttpContext GetHttpContext()
+        {
+            return HttpContext;
+        }
+
+        public IActionResult CerrarSesion()
+        {
+            
+            return RedirectToAction("IndexBienvenida");
+        }
+
+
         [HttpPost]
         [HttpPost]
         public async Task<IActionResult> InicioSesion(Usuario usuarioIngresado)
@@ -76,6 +89,7 @@ namespace TPT_JUEGOS.Controllers
 
             return resultado;
         }
+        
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
