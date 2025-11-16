@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido";
+
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+
+    <style>
+        
+    </style>
+</head>
+<body>
+
+    <div class="container-bienvenida">
+        <h1>Bienvenido/a</h1>
+        <p>Por favor, inicia sesión o registrate.</p>
+
+        <a href="/Home/InicioSesion" class="btn btn-login">
+            Iniciar Sesión
+        </a>
+
+        <a href="/Usuario/Create" class="btn btn-register">
+            Registrarse
+        </a>
+    </div>
+
+</body>
+</html>

@@ -1,7 +1,42 @@
-﻿
-@{
-    ViewData["Title"] = "InicioSesion";
+﻿@{
+    ViewData["Title"] = "Inicio de Sesión";
 }
 
-<h1>InicioSesion</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+</head>
+<body>
+
+    <div style="text-align:center; margin-top: 50px;">
+        <h1>Iniciar Sesión</h1>
+
+        <form action="/Home/InicioSesion" method="post">
+
+            <div style="margin-bottom: 15px;">
+                <label>Usuario o Email:</label><br>
+                <input type="text" name="NOMBRE_USUARIO" placeholder="Ingrese usuario" required />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label>Contraseña:</label><br>
+                <input type="password" name="CONTRASENA_USUARIO" placeholder="Ingrese su clave" required />
+            </div>
+
+            <input type="submit" value="INGRESAR" style="padding: 10px 20px; cursor: pointer;" />
+        </form>
+
+        @if (ViewData["MensajeError"] != null)
+        {
+            <div style="color: red; margin-top: 20px; font-weight: bold;">
+                @ViewData["MensajeError"]
+            </div>
+        }
+
+    </div>
+
+</body>
+</html>
 
