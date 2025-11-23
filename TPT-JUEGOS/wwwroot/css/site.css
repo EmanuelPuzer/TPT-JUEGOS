@@ -1,8 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Varela+Round&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&family=Varela+Round&display=swap');
 * {
     color: white;
-    font-family: "Jersey 10", sans-serif;
-    font-weight: 400;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 500;
     font-style: normal;
 }
 
@@ -48,4 +49,35 @@ body {
 #banner {
 
     border-radius:15px;
+    margin-bottom: 2vh;
 }
+.lupa {
+    height: 1.9vh;
+}
+.divJuego {
+    background-color: #8E52B7;
+    max-width: 20vh;
+    text-align: center;
+    border-radius: 10%;
+    padding-top: 1vh;
+    margin-top: 4vh;
+}
+.imagenJuego {
+    height: 10vh;
+}
+.tetris {
+    height: 10vh;
+}
+.tituloJuego {
+    font-family: "Jersey 10", sans-serif;
+}
+.subtitulo {
+    color: white;
+    -webkit-text-stroke: 3px black;
+    font-size: 6vh;
+    position: absolute;
+    left: 80vh;
+    top: 83vh;
+
+}
+
