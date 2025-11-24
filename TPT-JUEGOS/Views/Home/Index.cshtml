@@ -1,8 +1,78 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<TPT_JUEGOS.Models.Juego>
+
+@{
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@if (ViewBag.Usuario != null)
+{
+    <div class="caja-alerta alerta-exito">
+        <strong>¡Hola @ViewBag.Usuario!</strong> Sesión iniciada.
+        <small>(Rol: @(ViewBag.TipoUsuario == 1 ? "Admin" : "Jugador"))</small>
+    </div>
+}
+
+<div>
+    <img src="~/images/Pagina principal/NUEVOS JUEGOS ESTÁN LLEGANDO.png" alt="Banner" class="banner-img" />
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["MensajeError"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["MensajeError"]</div>
+}
+
+<form class="contenedor-buscador" asp-controller="Home" asp-action="Index" method="get">
+    <button class="boton-buscar" type="submit">
+        <img src="~/images/Pagina principal/lupa (1).png" class="icono-lupa" />
+    </button>
+    <input class="input-buscador" type="search" name="busqueda" placeholder="Buscar juego..." aria-label="Buscar">
+    <a href="/Home/Index" class="enlace-ver-todos">Ver todos</a>
+</form>
+
+<div class="contenedor-juegos">
+    @if (Model.Any())
+    {
+        @foreach (var juego in Model)
+        {
+            <div class="tarjeta-juego">
+                <img src="~/images/Pagina principal/@juego.NOMBRE_IMAGEN" class="img-juego" />
+
+                <h3 class="titulo-juego">@juego.NOMBRE_JUEGO</h3>
+
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="/Juego/Jugar?id=@juego.Id_JUEGO" class="btn-jugar">JUGAR</a>
+                    <a href="/Juego/AgregarFavorito?idJuego=@juego.Id_JUEGO" class="btn-fav">★</a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p style="width:100%; text-align:center;">No se encontraron juegos.</p>
+    }
+</div>
+
+<div class="seccion-proximamente">
+    <h2 class="texto-proximamente">PRÓXIMAMENTE...</h2>
+
+    <div class="tarjeta-opaca">
+        <img src="~/images/Pagina principal/secreto.png" class="img-juego" />
+        <h3 class="titulo-juego">???</h3>
+    </div>
+    <div class="tarjeta-opaca">
+        <img src="~/images/Pagina principal/secreto.png" class="img-juego" />
+        <h3 class="titulo-juego">???</h3>
+    </div>
+    <div class="tarjeta-opaca">
+        <img src="~/images/Pagina principal/secreto.png" class="img-juego" />
+        <h3 class="titulo-juego">???</h3>
+    </div>
+    <div class="tarjeta-opaca">
+        <img src="~/images/Pagina principal/secreto.png" class="img-juego" />
+        <h3 class="titulo-juego">???</h3>
+    </div>
 </div>

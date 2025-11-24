@@ -1,53 +1,87 @@
 ﻿@model TPT_JUEGOS.Models.Usuario
 
 @{
-    ViewData["Title"] = "Create";
+    Layout = null; 
+    ViewData["Title"] = "Registrarse";
 }
 
-<h1>Create</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TPT GAMES</title>
 
-<h4>Usuario</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NOMBRE_PERSONA" class="control-label"></label>
-                <input asp-for="NOMBRE_PERSONA" class="form-control" />
-                <span asp-validation-for="NOMBRE_PERSONA" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EDAD_USUARIO" class="control-label"></label>
-                <input asp-for="EDAD_USUARIO" class="form-control" />
-                <span asp-validation-for="EDAD_USUARIO" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NOMBRE_USUARIO" class="control-label"></label>
-                <input asp-for="NOMBRE_USUARIO" class="form-control" />
-                <span asp-validation-for="NOMBRE_USUARIO" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CORREO_USUARIO" class="control-label"></label>
-                <input asp-for="CORREO_USUARIO" class="form-control" />
-                <span asp-validation-for="CORREO_USUARIO" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CONTRASENA_USUARIO" class="control-label"></label>
-                <input asp-for="CONTRASENA_USUARIO" class="form-control" />
-                <span asp-validation-for="CONTRASENA_USUARIO" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body style="margin:0; padding:0; overflow-x:hidden;">
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    <form asp-action="Create" method="post" class="form-registro-split">
+
+        <div class="lado-izquierdo">
+
+            <div class="header-registro">
+                <img src="~/images/Logos/Logo TPTGames.png" alt="TPT Games" class="logo-registro" />
+            </div>
+
+            <div class="contenedor-inputs-registro">
+
+                <div class="fila-formulario">
+                    <label asp-for="NOMBRE_PERSONA" class="label-pixel">Nombre Completo:</label>
+                    <input asp-for="NOMBRE_PERSONA" class="input-pixel" autocomplete="off" />
+                    <span asp-validation-for="NOMBRE_PERSONA" class="text-danger" style="display:none;"></span>
+                </div>
+
+                <div class="fila-formulario">
+                    <label asp-for="EDAD_USUARIO" class="label-pixel">Edad:</label>
+                    <input asp-for="EDAD_USUARIO" type="number" class="input-pixel" />
+                    <span asp-validation-for="EDAD_USUARIO" class="text-danger" style="display:none;"></span>
+                </div>
+
+                <div class="fila-formulario">
+                    <label asp-for="NOMBRE_USUARIO" class="label-pixel">Usuario:</label>
+                    <input asp-for="NOMBRE_USUARIO" class="input-pixel" autocomplete="off" />
+                    <span asp-validation-for="NOMBRE_USUARIO" class="text-danger" style="display:none;"></span>
+                </div>
+
+                <div class="fila-formulario">
+                    <label asp-for="CORREO_USUARIO" class="label-pixel">Email:</label>
+                    <input asp-for="CORREO_USUARIO" type="email" class="input-pixel" />
+                    <span asp-validation-for="CORREO_USUARIO" class="text-danger" style="display:none;"></span>
+                </div>
+
+                <div class="fila-formulario">
+                    <label asp-for="CONTRASENA_USUARIO" class="label-pixel">Contraseña:</label>
+                    <input asp-for="CONTRASENA_USUARIO" type="password" class="input-pixel" />
+                    <span asp-validation-for="CONTRASENA_USUARIO" class="text-danger" style="display:none;"></span>
+                </div>
+
+                <div asp-validation-summary="ModelOnly" class="text-danger text-center mt-3"></div>
+
+                <div style="text-align:center; margin-top:20px;">
+                    <a href="/Home/IndexBienvenida" class="link-olvido">Cancelar / Volver</a>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="lado-derecho-btn" title="Confirmar Registro">
+            <div class="icono-flecha">
+                >
+            </div>
+        </button>
+
+    </form>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+</body>
+</html>

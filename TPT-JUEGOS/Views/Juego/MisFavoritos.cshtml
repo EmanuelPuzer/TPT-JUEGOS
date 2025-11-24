@@ -1,0 +1,41 @@
+﻿@model IEnumerable<TPT_JUEGOS.Models.Juego>
+
+@{
+    ViewData["Title"] = "Mis Favoritos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+
+    <h2 class="titulo-seccion">🎮 Mis Juegos Favoritos</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="caja-sin-favoritos">
+            <h4>Todavía no agregaste ningún juego como favorito.</h4>
+            <p>Andá al inicio y agregá algunos juegos a tus favoritos.</p>
+
+            <a href="/Home/Index" class="btn-verde" style="font-size: 1rem; padding: 10px 20px;">
+                Ir a Buscar Juegos
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="contenedor-juegos">
+            @foreach (var juego in Model)
+            {
+                <div class="tarjeta-juego">
+
+                    <img src="~/images/Pagina principal/@juego.NOMBRE_IMAGEN" class="img-juego" />
+
+                    <h3 class="titulo-juego">@juego.NOMBRE_JUEGO</h3>
+
+                    <div class="d-flex justify-content-center gap-2 mt-2">
+                        <a href="/Juego/Jugar?id=@juego.Id_JUEGO" class="btn-jugar">JUGAR</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

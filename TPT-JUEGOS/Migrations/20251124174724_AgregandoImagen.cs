@@ -5,25 +5,22 @@
 namespace TPT_JUEGOS.Migrations
 {
     /// <inheritdoc />
-    public partial class tipousuario : Migration
+    public partial class AgregandoImagen : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "TIPO_USUARIO",
-                table: "Usuarios",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+            migrationBuilder.AddColumn<string>(
+        name: "NOMBRE_IMAGEN",
+        table: "Juegos",
+        type: "nvarchar(max)",
+        nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "TIPO_USUARIO",
-                table: "Usuarios");
+
         }
     }
 }

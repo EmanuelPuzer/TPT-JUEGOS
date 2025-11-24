@@ -8,11 +8,11 @@ using TPT_JUEGOS.Context;
 
 #nullable disable
 
-namespace TPT_JUEGOS.Migrations
+namespace TPT_JUEGOS.Migrations.JuegoDatabase
 {
-    [DbContext(typeof(UsuariosDatabaseContext))]
-    [Migration("20251116184355_tipousuario")]
-    partial class tipousuario
+    [DbContext(typeof(JuegoDatabaseContext))]
+    [Migration("20251116195406_juegoBDema")]
+    partial class juegoBDema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,39 +24,28 @@ namespace TPT_JUEGOS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TPT_JUEGOS.Models.Usuario", b =>
+            modelBuilder.Entity("TPT_JUEGOS.Models.Juego", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Id_JUEGO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_JUEGO"));
 
-                    b.Property<string>("CONTRASENA_USUARIO")
+                    b.Property<string>("CODIGO_JUEGO")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CORREO_USUARIO")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EDAD_USUARIO")
+                    b.Property<int>("JUEGO_ACTIVO")
                         .HasColumnType("int");
 
-                    b.Property<string>("NOMBRE_PERSONA")
+                    b.Property<string>("NOMBRE_JUEGO")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NOMBRE_USUARIO")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("Id_JUEGO");
 
-                    b.Property<int>("TIPO_USUARIO")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Usuarios");
+                    b.ToTable("Juegos");
                 });
 #pragma warning restore 612, 618
         }

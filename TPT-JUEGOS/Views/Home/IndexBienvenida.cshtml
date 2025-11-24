@@ -1,31 +1,36 @@
 ﻿@{
+    Layout = null;
     ViewData["Title"] = "Bienvenido";
-
 }
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>@ViewData["Title"]</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TPT GAMES</title>
 
-    <style>
-        
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body class="cuerpo-bienvenida">
 
-    <div class="container-bienvenida">
-        <h1>Bienvenido/a</h1>
-        <p>Por favor, inicia sesión o registrate.</p>
+    <div class="contenedor-bienvenida">
 
-        <a href="/Home/InicioSesion" class="btn btn-login">
+        <img src="~/images/Logos/Logo TPTGames.png" alt="TPT Games Logo" class="logo-bienvenida" />
+
+        <a href="/Home/InicioSesion" class="btn-bienvenida">
             Iniciar Sesión
         </a>
 
-        <a href="/Usuario/Create" class="btn btn-register">
+        <a href="/Usuario/Create" class="btn-bienvenida">
             Registrarse
         </a>
+
     </div>
 
 </body>

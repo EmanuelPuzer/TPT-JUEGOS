@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscaminas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #tablero {
+      display: grid;
+      gap: 2px;
+      margin-top: 10px;
+      background: #555;
+      padding: 4px;
+      border-radius: 6px;
+    }
+    .celda {
+      width: 30px;
+      height: 30px;
+      background: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      user-select: none;
+    }
+    .celda.revelada {
+      background: #eee;
+      cursor: default;
+    }
+    .bomba {
+      background: red !important;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Buscaminas</h1>
+  <button onclick="iniciarJuego()">Nuevo Juego</button>
+  <div id="tablero"></div>
+
+  <script>
+    const filas = 8;   // cantidad de filas
+    const columnas = 8; // cantidad de columnas
+    const bombas = 10; // número de bombas
+    let tablero = [];
+
+    function iniciarJuego() {
+      const contenedor = document.getElementById("tablero");
+      contenedor.innerHTML = "";
+      contenedor.style.gridTemplateRows = `repeat(${filas}, 30px)`;
+      contenedor.style.gridTemplateColumns = `repeat(${columnas}, 30px)`;
+
+      tablero = Array(filas).fill().map(() => Array(columnas).fill({}));
+
+      // Crear tablero vacío
+      for (let f = 0; f < filas; f++) {
+        for (let c = 0; c < columnas; c++) {
+          const celda = document.createElement("div");
+          celda.classList.add("celda");
+          celda.dataset.fila = f;
+          celda.dataset.columna = c;
+          celda.addEventListener("click", revelarCelda);
+          contenedor.appendChild(celda);
+          tablero[f][c] = { esBomba: false, revelada: false, elemento: celda };
+        }
+      }
+
+      // Colocar bombas
+      let bombasColocadas = 0;
+      while (bombasColocadas < bombas) {
+        const f = Math.floor(Math.random() * filas);
+        const c = Math.floor(Math.random() * columnas);
+        if (!tablero[f][c].esBomba) {
+          tablero[f][c].esBomba = true;
+          bombasColocadas++;
+        }
+      }
+    }
+
+    function contarBombas(f, c) {
+      let contador = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          const nf = f + i;
+          const nc = c + j;
+          if (nf >= 0 && nf < filas && nc >= 0 && nc < columnas) {
+            if (tablero[nf][nc].esBomba) contador++;
+          }
+        }
+      }
+      return contador;
+    }
+
+    function revelarCelda(e) {
+      const f = parseInt(e.target.dataset.fila);
+      const c = parseInt(e.target.dataset.columna);
+      const celda = tablero[f][c];
+
+      if (celda.revelada) return;
+
+      celda.revelada = true;
+      celda.elemento.classList.add("revelada");
+
+      if (celda.esBomba) {
+        celda.elemento.classList.add("bomba");
+        celda.elemento.textContent = "💣";
+        alert("¡Perdiste!");
+        mostrarTodo();
+        return;
+      }
+
+      const bombasCerca = contarBombas(f, c);
+      if (bombasCerca > 0) {
+        celda.elemento.textContent = bombasCerca;
+      } else {
+        // revelar vecinas si no hay bombas cerca
+        for (let i = -1; i <= 1; i++) {
+          for (let j = -1; j <= 1; j++) {
+            const nf = f + i;
+            const nc = c + j;
+            if (nf >= 0 && nf < filas && nc >= 0 && nc < columnas) {
+              revelarVecina(nf, nc);
+            }
+          }
+        }
+      }
+    }
+
+    function revelarVecina(f, c) {
+      const celda = tablero[f][c];
+      if (!celda.revelada && !celda.esBomba) {
+        celda.revelada = true;
+        celda.elemento.classList.add("revelada");
+        const bombasCerca = contarBombas(f, c);
+        if (bombasCerca > 0) {
+          celda.elemento.textContent = bombasCerca;
+        } else {
+          for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+              const nf = f + i;
+              const nc = c + j;
+              if (nf >= 0 && nf < filas && nc >= 0 && nc < columnas) {
+                revelarVecina(nf, nc);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function mostrarTodo() {
+      for (let f = 0; f < filas; f++) {
+        for (let c = 0; c < columnas; c++) {
+          const celda = tablero[f][c];
+          if (celda.esBomba) {
+            celda.elemento.textContent = "💣";
+            celda.elemento.classList.add("bomba");
+          } else {
+            const bombasCerca = contarBombas(f, c);
+            if (bombasCerca > 0) {
+              celda.elemento.textContent = bombasCerca;
+            }
+            celda.elemento.classList.add("revelada");
+          }
+        }
+      }
+    }
+
+    // iniciar al cargar
+    iniciarJuego();
+  </script>
+</body>
+</html>

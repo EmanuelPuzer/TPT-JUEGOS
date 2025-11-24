@@ -1,0 +1,51 @@
+﻿@model TPT_JUEGOS.Models.Juego
+
+@{
+    ViewData["Title"] = "Jugando a " + Model.NOMBRE_JUEGO;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.NOMBRE_JUEGO - TPT GAMES</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="cuerpo-juego">
+
+    <a href="/Home/Index" class="btn-volver">
+        < Volver al Menú
+    </a>
+
+    <h1 class="titulo-juego-activo">Estás jugando a: @Model.NOMBRE_JUEGO</h1>
+
+    <div id="contenedor-juego" style="width:100%; display:flex; justify-content:center;">
+
+        @if (Model.NOMBRE_JUEGO == "Tetris")
+        {
+            <iframe src="~/juegos/tetris.html" class="iframe-juego"></iframe>
+        }
+        else if (Model.NOMBRE_JUEGO == "Space Invaders")
+        {
+            <iframe src="~/juegos/spaceinvaders.html" class="iframe-juego"></iframe>
+        }
+        else if (Model.NOMBRE_JUEGO == "Buscaminas")
+        {
+            <iframe src="~/juegos/buscaminas.html" class="iframe-juego"></iframe>
+        }
+        else
+        {
+            <h2 style="margin-top:50px;">Juego no implementado.</h2>
+        }
+
+    </div>
+
+</body>
+</html>

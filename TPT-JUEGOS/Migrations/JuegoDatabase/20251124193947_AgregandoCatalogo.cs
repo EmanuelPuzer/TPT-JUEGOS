@@ -2,29 +2,28 @@
 
 #nullable disable
 
-namespace TPT_JUEGOS.Migrations
+namespace TPT_JUEGOS.Migrations.JuegoDatabase
 {
     /// <inheritdoc />
-    public partial class BaseDatos : Migration
+    public partial class AgregandoCatalogo : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+           
+
             migrationBuilder.CreateTable(
-                name: "Usuarios",
+                name: "CatalogoJuegos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NOMBRE_PERSONA = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EDAD_USUARIO = table.Column<int>(type: "int", nullable: false),
-                    NOMBRE_USUARIO = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CORREO_USUARIO = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CONTRASENA_USUARIO = table.Column<int>(type: "int", nullable: false)
+                    UsuarioId = table.Column<int>(type: "int", nullable: false),
+                    JuegoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Usuarios", x => x.Id);
+                    table.PrimaryKey("PK_CatalogoJuegos", x => x.Id);
                 });
         }
 
@@ -32,7 +31,11 @@ namespace TPT_JUEGOS.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Usuarios");
+                name: "CatalogoJuegos");
+
+            migrationBuilder.DropColumn(
+                name: "NOMBRE_IMAGEN",
+                table: "Juegos");
         }
     }
 }

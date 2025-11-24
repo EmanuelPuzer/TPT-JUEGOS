@@ -13,13 +13,21 @@ namespace TPT_JUEGOS
 
             builder.Services.AddDbContext<JuegoDatabaseContext>(options =>options.UseSqlServer(builder.Configuration["ConnectionString:TPTJUEGOSSTRINGConnection"]));
 
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
 
+            builder.Services.AddHttpContextAccessor();
 
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            app.UseSession();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

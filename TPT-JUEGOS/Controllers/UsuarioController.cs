@@ -60,7 +60,7 @@ namespace TPT_JUEGOS.Controllers
             {
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("InicioSesion", "Home");
             }
             return View(usuario);
         }
@@ -115,6 +115,61 @@ namespace TPT_JUEGOS.Controllers
             }
             return View(usuario);
         }
+
+        // GET: Usuario/MiPerfil
+        public async Task<IActionResult> MiPerfil()
+        {
+            var idString = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(idString))
+            {
+                return RedirectToAction("InicioSesion", "Home");
+            }
+
+            int id = int.Parse(idString);
+            var usuario = await _context.Usuarios.FindAsync(id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            return View(usuario);
+        }
+
+        // POST: Usuario/MiPerfil
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MiPerfil(Usuario usuarioModificado)
+        {
+            var idString = HttpContext.Session.GetString("UsuarioId");
+            int idSesion = int.Parse(idString!);
+
+            if (idSesion != usuarioModificado.Id)
+            {
+                return Unauthorized();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(usuarioModificado);
+                    await _context.SaveChangesAsync();
+
+                    HttpContext.Session.SetString("NombreUsuario", usuarioModificado.NOMBRE_USUARIO);
+                    TempData["Mensaje"] = "¡Datos actualizados correctamente!";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    TempData["MensajeError"] = "Error al guardar los datos.";
+                }
+
+                return View(usuarioModificado);
+            }
+
+            return View(usuarioModificado);
+        }
+
 
         // GET: Usuario/Delete/5
         public async Task<IActionResult> Delete(int? id)

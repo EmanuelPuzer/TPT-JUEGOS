@@ -1,42 +1,56 @@
 ﻿@{
-    ViewData["Title"] = "Inicio de Sesión";
+    Layout = null;
+    ViewData["Title"] = "Iniciar Sesión";
 }
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>Login</title>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
 
-    <div style="text-align:center; margin-top: 50px;">
-        <h1>Iniciar Sesión</h1>
+<body class="cuerpo-bienvenida">
 
-        <form action="/Home/InicioSesion" method="post">
+    <div class="contenedor-login">
 
-            <div style="margin-bottom: 15px;">
-                <label>Usuario o Email:</label><br>
-                <input type="text" name="NOMBRE_USUARIO" placeholder="Ingrese usuario" required />
+        <img src="~/images/Logos/Logo TPTGames.png" alt="Logo" class="logo-bienvenida" style="margin-bottom: 20px;" />
+
+        <form action="/Home/InicioSesion" method="post" style="width: 100%;">
+
+            <div class="fila-formulario">
+                <label class="label-pixel">Usuario:</label>
+                <input type="text" name="NOMBRE_USUARIO" class="input-pixel" placeholder="Nombre de Usuario" required autocomplete="off" />
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label>Contraseña:</label><br>
-                <input type="password" name="CONTRASENA_USUARIO" placeholder="Ingrese su clave" required />
+            <div class="fila-formulario">
+                <label class="label-pixel">Contraseña:</label>
+                <input type="password" name="CONTRASENA_USUARIO" class="input-pixel" placeholder="Contraseña" required />
             </div>
 
-            <input type="submit" value="INGRESAR" style="padding: 10px 20px; cursor: pointer;" />
+            <div style="margin-top: 20px;">
+                <input type="submit" value="Iniciar Sesión" class="btn-verde" />
+            </div>
+
         </form>
 
         @if (ViewData["MensajeError"] != null)
         {
-            <div style="color: red; margin-top: 20px; font-weight: bold;">
+            <div class="caja-alerta alerta-error" style="margin-top: 20px;">
                 @ViewData["MensajeError"]
             </div>
         }
+
+        <a href="/Home/IndexBienvenida" class="link-olvido" style="margin-top:20px; display:block;">Volver al Inicio</a>
 
     </div>
 
 </body>
 </html>
-

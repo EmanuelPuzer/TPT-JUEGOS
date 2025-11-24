@@ -1,0 +1,59 @@
+﻿@model TPT_JUEGOS.Models.Usuario
+
+@{
+    ViewData["Title"] = "Mi Perfil";
+    
+}
+
+<div class="contenedor-centrado">
+
+    <div class="tarjeta-perfil">
+
+        <h2 class="titulo-perfil">Mis Datos</h2>
+
+        @if (TempData["Mensaje"] != null)
+        {
+            <div class="caja-alerta alerta-exito">@TempData["Mensaje"]</div>
+        }
+
+        @if (TempData["MensajeError"] != null)
+        {
+            <div class="caja-alerta alerta-error">@TempData["MensajeError"]</div>
+        }
+
+        <form asp-action="MiPerfil" method="post" style="width: 100%;">
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="fila-formulario">
+                <label asp-for="NOMBRE_PERSONA" class="label-pixel">Nombre:</label>
+                <input asp-for="NOMBRE_PERSONA" class="input-pixel" autocomplete="off" />
+            </div>
+
+            <div class="fila-formulario">
+                <label asp-for="EDAD_USUARIO" class="label-pixel">Edad:</label>
+                <input asp-for="EDAD_USUARIO" type="number" class="input-pixel" />
+            </div>
+
+            <div class="fila-formulario">
+                <label asp-for="NOMBRE_USUARIO" class="label-pixel">Usuario:</label>
+                <input asp-for="NOMBRE_USUARIO" class="input-pixel" autocomplete="off" />
+            </div>
+
+            <div class="fila-formulario">
+                <label asp-for="CORREO_USUARIO" class="label-pixel">Email:</label>
+                <input asp-for="CORREO_USUARIO" class="input-pixel" />
+            </div>
+
+            <div class="fila-formulario">
+                <label asp-for="CONTRASENA_USUARIO" class="label-pixel">Contraseña:</label>
+                <input asp-for="CONTRASENA_USUARIO" class="input-pixel" />
+            </div>
+
+            <div class="contenedor-boton-perfil">
+                <input type="submit" value="Guardar Cambios" class="btn-verde" />
+            </div>
+
+        </form>
+    </div>
+</div>

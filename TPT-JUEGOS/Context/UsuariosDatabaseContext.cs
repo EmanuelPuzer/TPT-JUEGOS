@@ -14,6 +14,7 @@ namespace TPT_JUEGOS.Context
         {
         }
         public DbSet<Usuario> Usuarios { get; set; }
-    
+        public DbSet<Juego> Juegos { get; set; }
+
     }
 }

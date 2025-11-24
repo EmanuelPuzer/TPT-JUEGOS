@@ -23,12 +23,22 @@ namespace TPT_JUEGOS.Controllers
             ViewData["OcultarNavbar"] = true;
             return View();
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string busqueda)
         {
-            return View();
+            ViewBag.Usuario = HttpContext.Session.GetString("usuario");
+            ViewBag.TipoUsuario = HttpContext.Session.GetInt32("tipo");
+
+            var juegos = _context.Juegos.AsQueryable();
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                juegos = juegos.Where(j => j.NOMBRE_JUEGO.Contains(busqueda));
+            }
+
+            return View(juegos.ToList());
         }
 
-        
+
         public IActionResult InicioSesion()
         {
             ViewData["OcultarNavbar"] = true;
@@ -42,7 +52,7 @@ namespace TPT_JUEGOS.Controllers
 
         public IActionResult CerrarSesion()
         {
-            
+            HttpContext.Session.Clear();
             return RedirectToAction("IndexBienvenida");
         }
 
@@ -79,18 +89,24 @@ namespace TPT_JUEGOS.Controllers
                     continue;
                 }
 
+                HttpContext.Session.SetString("UsuarioId", usuarioEncontrado.Id.ToString());
+                HttpContext.Session.SetString("NombreUsuario", usuarioEncontrado.NOMBRE_USUARIO);
+
                 estado = "exito";
             }
 
             if (estado == "exito")
             {
+                HttpContext.Session.SetString("usuario", usuarioEncontrado.NOMBRE_USUARIO);
+                HttpContext.Session.SetInt32("tipo", usuarioEncontrado.TIPO_USUARIO);
+
                 resultado = RedirectToAction("Index");
             }
 
             return resultado;
         }
-        
 
+       
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -21,6 +21,34 @@ namespace TPT_JUEGOS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("TPT_JUEGOS.Models.Juego", b =>
+                {
+                    b.Property<int>("Id_JUEGO")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_JUEGO"));
+
+                    b.Property<string>("CODIGO_JUEGO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JUEGO_ACTIVO")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NOMBRE_IMAGEN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NOMBRE_JUEGO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id_JUEGO");
+
+                    b.ToTable("Juegos");
+                });
+
             modelBuilder.Entity("TPT_JUEGOS.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")

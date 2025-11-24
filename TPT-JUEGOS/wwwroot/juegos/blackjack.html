@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Blackjack - Versión completa</title>
+<style>
+  :root{
+    --bg:#081218;
+    --felt:#0b3b2b;
+    --panel:#0f2a20;
+    --accent:#ffd966;
+    --muted:#b8d8c2;
+    --card-width:84px;
+    --card-height:120px;
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(180deg,#04121a 0%, #08232b 100%);color:var(--muted)}
+  .app{max-width:1100px;margin:24px auto;padding:20px;display:grid;grid-template-columns:1fr 380px;gap:20px}
+
+  /* MESA */
+  .mesa{background:linear-gradient(180deg,var(--felt),#063d2b);border-radius:14px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.6);position:relative}
+  .mesa-header{display:flex;justify-content:space-between;align-items:center;color:var(--accent)}
+  .mesa-canvas{height:420px;margin-top:14px;border-radius:12px;background:transparent;position:relative;overflow:hidden}
+
+  /* zonas de cartas */
+  .zona{position:absolute;left:20px;right:20px}
+  .jugador-zona{bottom:18px;height:180px}
+  .dealer-zona{top:18px;height:180px}
+  .zona-titulo{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .mano{display:flex;gap:12px;align-items:flex-end}
+
+  /* carta */
+  .carta{width:var(--card-width);height:var(--card-height);border-radius:8px;background:white;color:black;display:flex;flex-direction:column;justify-content:space-between;padding:8px;box-shadow:0 6px 14px rgba(0,0,0,.45);transform-origin:center center;transition:transform .35s ease, top .35s ease, left .35s ease, opacity .25s;position:relative}
+  .carta.back{background:linear-gradient(135deg,#0b5b3f,#0a9c75);color:white}
+  .valor{font-weight:700;font-size:18px}
+  .palo{font-size:20px;opacity:.9}
+  .small{font-size:12px;opacity:.8}
+
+  /* animaciones para repartir */
+  .repartir .carta{transform:translateY(-10px) rotate(-4deg)}
+  .ganador{animation:glow .9s ease-in-out}
+  @keyframes glow{0%{box-shadow:0 0 0 rgba(255,255,0,0)}50%{box-shadow:0 0 20px rgba(255,215,0,.6)}100%{box-shadow:0 0 0 rgba(255,255,0,0)}}
+
+  /* panel lateral */
+  .panel{background:var(--panel);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+  .saldo{font-size:18px;color:var(--accent);font-weight:700}
+  .bets{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#fff,#f1f1f1);color:#111;cursor:pointer;box-shadow:0 6px 12px rgba(0,0,0,.35);user-select:none}
+  .chip.selected{outline:3px solid rgba(255,217,102,.15);transform:translateY(-4px)}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  button{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+  button:active{transform:translateY(1px)}
+  .btn-green{background:linear-gradient(180deg,#38b000,#2a8a00);color:white}
+  .btn-blue{background:linear-gradient(180deg,#2e9cff,#1b6fe0);color:white}
+  .btn-red{background:linear-gradient(180deg,#ff6b6b,#ff3b3b);color:white}
+
+  .info{font-size:13px;color:var(--muted)}
+  .mensaje{font-weight:800;color:var(--accent);font-size:16px;text-align:center}
+
+  /* pequeños elementos */
+  .fila{display:flex;justify-content:space-between;align-items:center}
+  .historial{max-height:120px;overflow:auto;padding:8px;background:rgba(255,255,255,.03);border-radius:8px;font-size:13px}
+
+  /* responsive */
+  @media(max-width:920px){.app{grid-template-columns:1fr;}.mesa{order:2}}
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="mesa" role="application" aria-label="Mesa de Blackjack">
+      <div class="mesa-header">
+        <div>
+          <div style="font-size:20px;font-weight:800">Blackjack</div>
+          <div class="info">Reglas: Dealer se planta en 17. Blackjack paga 3:2. Double allowed. Baraja de 52 cartas.</div>
+        </div>
+        <div class="info">Ema - Versión completa</div>
+      </div>
+
+      <div class="mesa-canvas" id="mesaCanvas">
+        <div class="zona dealer-zona" id="dealerZona">
+          <div class="zona-titulo">Crupier — <span id="dealerTotal">0</span></div>
+          <div class="mano" id="dealerMano"></div>
+        </div>
+
+        <div class="zona jugador-zona" id="jugadorZona">
+          <div class="zona-titulo">Jugador — <span id="jugadorTotal">0</span></div>
+          <div class="mano" id="jugadorMano"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
+        <div class="mensaje" id="mensaje"></div>
+      </div>
+    </div>
+
+    <aside class="panel" aria-label="Panel de juego">
+      <div class="fila"><div>Saldo</div><div class="saldo" id="saldo">$1000</div></div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:8px">Seleccionar apuesta</div>
+        <div class="bets" id="chips">
+          <div class="chip" data-value="10">$10</div>
+          <div class="chip" data-value="50">$50</div>
+          <div class="chip" data-value="100">$100</div>
+          <div class="chip" data-value="500">$500</div>
+        </div>
+        <div style="margin-top:8px" class="info">Apuesta actual: <span id="apuestaAct">$0</span></div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:8px">Controles</div>
+        <div class="controls">
+          <button class="btn-green" id="btnDeal">Repartir</button>
+          <button class="btn-blue" id="btnHit">Pedir</button>
+          <button class="btn-blue" id="btnStand">Plantarse</button>
+          <button class="btn-blue" id="btnDouble">Doblar</button>
+          <button class="btn-red" id="btnNew">Nuevo Juego</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:8px">Historial</div>
+        <div class="historial" id="historial"></div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:8px">Sonidos</div>
+        <div class="controls">
+          <button id="soundToggle" class="btn-blue">Toggle Sonidos</button>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+<script>
+// -----------------------------
+// LÓGICA DEL JUEGO (TODO EN UN ARCHIVO ÚNICO)
+// -----------------------------
+
+const suits = ['♠','♥','♦','♣'];
+const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+let deck = [];
+let jugador = [];
+let dealer = [];
+let saldo = 1000;
+let apuesta = 0;
+let inRound = false;
+let sonidosOn = true;
+let canDouble = false;
+
+// ELEMENTOS
+const dealerManoEl = document.getElementById('dealerMano');
+const jugadorManoEl = document.getElementById('jugadorMano');
+const dealerTotalEl = document.getElementById('dealerTotal');
+const jugadorTotalEl = document.getElementById('jugadorTotal');
+const mensajeEl = document.getElementById('mensaje');
+const saldoEl = document.getElementById('saldo');
+const apuestaActEl = document.getElementById('apuestaAct');
+const btnDeal = document.getElementById('btnDeal');
+const btnHit = document.getElementById('btnHit');
+const btnStand = document.getElementById('btnStand');
+const btnDouble = document.getElementById('btnDouble');
+const btnNew = document.getElementById('btnNew');
+const chipsEl = document.getElementById('chips');
+const historialEl = document.getElementById('historial');
+const soundToggle = document.getElementById('soundToggle');
+
+// AUDIO: simple oscillator-based sounds
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function beep(freq=440, duration=0.08){
+  if(!sonidosOn) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.frequency.value = freq; o.type = 'sine';
+  o.connect(g); g.connect(audioCtx.destination);
+  g.gain.value = 0.001;
+  const now = audioCtx.currentTime;
+  g.gain.linearRampToValueAtTime(0.15, now+0.01);
+  o.start(now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now+duration);
+  o.stop(now+duration+0.02);
+}
+
+soundToggle.onclick = ()=>{sonidosOn = !sonidosOn; soundToggle.textContent = sonidosOn? 'Sonidos: ON':'Sonidos: OFF';}
+
+// crear y mezclar deck
+function crearDeck(){
+  deck = [];
+  for(const s of suits) for(const r of ranks) deck.push({suit:s,rank:r});
+  mezclar(deck);
+}
+function mezclar(array){
+  for(let i=array.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [array[i],array[j]] = [array[j],array[i]];
+  }
+}
+function tomarCarta(){
+  if(deck.length===0){crearDeck(); log('Se remezcla el mazo');}
+  return deck.pop();
+}
+
+// valor mano
+function valorMano(mano){
+  let total = 0; let ases = 0;
+  for(const c of mano){
+    if(c.rank==='A'){total += 11; ases++;}
+    else if(['J','Q','K'].includes(c.rank)) total += 10;
+    else total += Number(c.rank);
+  }
+  while(total>21 && ases>0){total -= 10; ases--;}
+  return total;
+}
+
+// render cartas
+function crearCartaEl(c, faceUp=true){
+  const el = document.createElement('div');
+  el.className = 'carta' + (faceUp? '':' back');
+  if(!faceUp) return el;
+  const color = (c.suit==='♥' || c.suit==='♦')? 'red':'black';
+  el.innerHTML = `<div class="small" style="color:${color}">${c.rank}${c.suit}</div><div class="palo" style="text-align:center;color:${color}">${c.suit}</div><div class="small" style="text-align:right;color:${color}">${c.rank}${c.suit}</div>`;
+  return el;
+}
+
+function render(){
+  // limpia
+  dealerManoEl.innerHTML=''; jugadorManoEl.innerHTML='';
+  // dealer: mostramos la primera carta visible y la segunda oculta si está en ronda
+  for(let i=0;i<dealer.length;i++){
+    const faceUp = !(i===1 && inRound); // segunda carta oculta mientras ronda activa
+    const el = crearCartaEl(dealer[i], faceUp);
+    dealerManoEl.appendChild(el);
+    // pequeña separación o rotación
+    el.style.transform = `rotate(${(i-1)*6}deg)`;
+  }
+  for(let i=0;i<jugador.length;i++){
+    const el = crearCartaEl(jugador[i], true);
+    jugadorManoEl.appendChild(el);
+    el.style.transform = `rotate(${(i-(jugador.length-1)/2)*6}deg) translateY(${i===jugador.length-1? '-6px':'0'})`;
+  }
+  jugadorTotalEl.textContent = valorMano(jugador);
+  dealerTotalEl.textContent = inRound ? (valorMano([dealer[0]]) ) : valorMano(dealer);
+}
+
+function estadoBotones(){
+  btnHit.disabled = !inRound;
+  btnStand.disabled = !inRound;
+  btnDouble.disabled = !(inRound && jugador.length===2 && saldo>=apuesta);
+  btnDeal.disabled = inRound || apuesta===0 || apuesta>saldo;
+}
+
+function log(text){
+  const p = document.createElement('div');
+  p.textContent = `${new Date().toLocaleTimeString()} — ${text}`;
+  historialEl.prepend(p);
+}
+
+// acciones
+function repartir(){
+  if(inRound) return;
+  if(apuesta===0){mensaje('Setea una apuesta'); return;}
+  if(apuesta>saldo){mensaje('No tenés saldo suficiente'); return;}
+  inRound = true; canDouble = true;
+  crearDeckIfNeeded();
+  jugador = [tomarCarta(), tomarCarta()];
+  dealer = [tomarCarta(), tomarCarta()];
+  saldo -= apuesta; // se bloquea la apuesta
+  beep(880,0.06);
+  render();
+  // chequeos inmediatos
+  const jVal = valorMano(jugador);
+  const dVal = valorMano(dealer);
+  if(jVal===21){
+    // Si jugador tiene blackjack: paga 3:2
+    inRound = false;
+    const pago = Math.floor(apuesta * 1.5);
+    saldo += apuesta + pago;
+    mensaje('Blackjack! Ganaste ' + (apuesta + pago) + '');
+    log(`Blackjack — Ganó $${apuesta + pago}`);
+    apuesta = 0; apuestaActEl.textContent = '$0';
+    render(); estadoBotones(); return;
+  }
+  render(); estadoBotones();
+}
+
+function crearDeckIfNeeded(){ if(deck.length<15) crearDeck(); }
+
+function pedir(){
+  if(!inRound) return;
+  jugador.push(tomarCarta());
+  beep(660,0.06);
+  render();
+  const val = valorMano(jugador);
+  if(val>21){
+    // pierde
+    inRound = false; mensaje('Te pasaste — Perdiste'); log(`Perdió $${apuesta}`);
+    apuesta = 0; apuestaActEl.textContent = '$0'; saldoEl.textContent = `$${saldo}`;
+  }
+  estadoBotones();
+}
+
+function plantarse(){
+  if(!inRound) return;
+  // dealer juega
+  inRound = false; render();
+  // revelar segunda carta y jugar
+  beep(440,0.06);
+  while(valorMano(dealer) < 17){
+    dealer.push(tomarCarta());
+    render();
+  }
+  const jVal = valorMano(jugador);
+  const dVal = valorMano(dealer);
+  if(dVal>21 || jVal> dVal){
+    const ganancia = apuesta*2;
+    saldo += ganancia; mensaje('Ganaste! +$' + ganancia); log(`Ganó $${ganancia}`);
+  } else if(dVal===jVal){
+    saldo += apuesta; mensaje('Empate — Se devuelve la apuesta'); log('Empate');
+  } else { mensaje('Perdiste'); log(`Perdió $${apuesta}`); }
+  apuesta = 0; apuestaActEl.textContent = '$0'; saldoEl.textContent = `$${saldo}`; render(); estadoBotones();
+}
+
+function doblar(){
+  if(!inRound || jugador.length!==2) return;
+  if(saldo < apuesta) { mensaje('Saldo insuficiente para doblar'); return; }
+  // doblar apuesta: se cobra una carta solo
+  saldo -= apuesta; apuesta *= 2; apuestaActEl.textContent = `$${apuesta}`; canDouble=false;
+  jugador.push(tomarCarta()); render();
+  if(valorMano(jugador)>21){ inRound=false; mensaje('Te pasaste después de doblar'); log(`Perdió $${apuesta}`); apuesta=0; apuestaActEl.textContent='$0'; saldoEl.textContent=`$${saldo}`; estadoBotones(); return; }
+  // dealer juega
+  inRound=false; while(valorMano(dealer)<17){dealer.push(tomarCarta());}
+  const jVal = valorMano(jugador); const dVal = valorMano(dealer);
+  if(dVal>21 || jVal> dVal){ const gan = apuesta*2; saldo += gan; mensaje('Ganaste! +$'+gan); log(`Ganó $${gan}`);} else if(dVal===jVal){ saldo += apuesta; mensaje('Empate'); log('Empate'); } else { mensaje('Perdiste'); log(`Perdió $${apuesta}`);} 
+  apuesta=0; apuestaActEl.textContent='$0'; saldoEl.textContent=`$${saldo}`; render(); estadoBotones();
+}
+
+function nuevoJuego(){
+  inRound=false; jugador=[]; dealer=[]; apuesta=0; apuestaActEl.textContent='$0'; mensaje('Listo para nueva mano'); estadoBotones(); render();
+}
+
+function mensaje(txt){ mensajeEl.textContent = txt; setTimeout(()=>{ if(mensajeEl.textContent===txt) mensajeEl.textContent=''; },3500);} 
+
+// selección de chips
+chipsEl.addEventListener('click', e=>{
+  const chip = e.target.closest('.chip'); if(!chip) return;
+  const v = Number(chip.dataset.value);
+  // toggle
+  if(chip.classList.contains('selected')){
+    chip.classList.remove('selected'); apuesta -= v;
+  } else {
+    chip.classList.add('selected'); apuesta += v;
+  }
+  // si sumó más que el saldo, revertir
+  if(apuesta > saldo){
+    mensaje('La apuesta supera tu saldo'); chip.classList.remove('selected'); apuesta -= v; return;
+  }
+  apuestaActEl.textContent = `$${apuesta}`;
+  estadoBotones();
+});
+
+// botones
+btnDeal.onclick = repartir;
+btnHit.onclick = pedir;
+btnStand.onclick = plantarse;
+btnDouble.onclick = doblar;
+btnNew.onclick = nuevoJuego;
+
+// atajos teclado
+document.addEventListener('keydown', e=>{
+  if(e.key===' '){ e.preventDefault(); if(inRound) pedir(); else repartir(); }
+  if(e.key.toLowerCase()==='p') plantarse();
+});
+
+// init
+crearDeck(); saldoEl.textContent = `$${saldo}`; estadoBotones(); render();
+
+// accesibilidad: focus inicial
+btnDeal.focus();
+
+</script>
+</body>
+</html>

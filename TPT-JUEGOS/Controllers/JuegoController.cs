@@ -19,6 +19,90 @@ namespace TPT_JUEGOS.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> Jugar(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            
+            var juego = await _context.Juegos
+                .FirstOrDefaultAsync(m => m.Id_JUEGO == id);
+
+            if (juego == null)
+            {
+                return NotFound();
+            }
+
+            
+            return View(juego);
+        }
+
+        public async Task<IActionResult> MisFavoritos()
+        {
+            
+            var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
+            if (usuarioIdString == null)
+            {
+                return RedirectToAction("InicioSesion", "Home");
+            }
+            int usuarioId = int.Parse(usuarioIdString);
+
+           
+            var idsJuegosFavoritos = await _context.CatalogoJuegos
+                .Where(c => c.UsuarioId == usuarioId)
+                .Select(c => c.JuegoId)
+                .ToListAsync();
+
+            var misJuegos = await _context.Juegos
+                .Where(j => idsJuegosFavoritos.Contains(j.Id_JUEGO))
+                .ToListAsync();
+
+            return View(misJuegos);
+        }
+
+        public async Task<IActionResult> AgregarFavorito(int idJuego)
+        {
+            
+            var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
+
+            if (usuarioIdString == null)
+            {
+                
+                return RedirectToAction("InicioSesion", "Home");
+            }
+
+            int usuarioId = int.Parse(usuarioIdString);
+
+            
+            var existe = await _context.CatalogoJuegos
+                .AnyAsync(c => c.UsuarioId == usuarioId && c.JuegoId == idJuego);
+
+            if (!existe)
+            {
+                
+                var nuevoFavorito = new CatalogoJuegos
+                {
+                    UsuarioId = usuarioId,
+                    JuegoId = idJuego
+                };
+
+                _context.CatalogoJuegos.Add(nuevoFavorito);
+                await _context.SaveChangesAsync();
+
+                
+                TempData["Mensaje"] = "¡Juego agregado a tus favoritos!";
+            }
+            else
+            {
+                TempData["MensajeError"] = "Este juego ya está en tus favoritos.";
+            }
+
+            
+            return RedirectToAction("Index", "Home");
+        }
+
         // GET: Juego
         public async Task<IActionResult> Index()
         {
@@ -54,7 +138,7 @@ namespace TPT_JUEGOS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id_JUEGO,NOMBRE_JUEGO,JUEGO_ACTIVO,CODIGO_JUEGO")] Juego juego)
+        public async Task<IActionResult> Create([Bind("Id_JUEGO,NOMBRE_JUEGO,JUEGO_ACTIVO,CODIGO_JUEGO,NOMBRE_IMAGEN")] Juego juego)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +170,7 @@ namespace TPT_JUEGOS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id_JUEGO,NOMBRE_JUEGO,JUEGO_ACTIVO,CODIGO_JUEGO")] Juego juego)
+        public async Task<IActionResult> Edit(int id, [Bind("Id_JUEGO,NOMBRE_JUEGO,JUEGO_ACTIVO,CODIGO_JUEGO,NOMBRE_IMAGEN")] Juego juego)
         {
             if (id != juego.Id_JUEGO)
             {

@@ -19,6 +19,8 @@ namespace TPT_JUEGOS.Models
         [Display(Name = "Codigo Juego")]
         public string CODIGO_JUEGO { get; set; }
 
+        public string NOMBRE_IMAGEN { get; set; }
+
     }
 }
 

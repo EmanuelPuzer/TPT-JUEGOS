@@ -8,11 +8,11 @@ using TPT_JUEGOS.Context;
 
 #nullable disable
 
-namespace TPT_JUEGOS.Migrations
+namespace TPT_JUEGOS.Migrations.JuegoDatabase
 {
-    [DbContext(typeof(UsuariosDatabaseContext))]
-    [Migration("20251116192436_juego")]
-    partial class juego
+    [DbContext(typeof(JuegoDatabaseContext))]
+    [Migration("20251124193947_AgregandoCatalogo")]
+    partial class AgregandoCatalogo
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace TPT_JUEGOS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TPT_JUEGOS.Models.Usuario", b =>
+            modelBuilder.Entity("TPT_JUEGOS.Models.CatalogoJuegos", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,31 +32,43 @@ namespace TPT_JUEGOS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CONTRASENA_USUARIO")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CORREO_USUARIO")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EDAD_USUARIO")
+                    b.Property<int>("JuegoId")
                         .HasColumnType("int");
 
-                    b.Property<string>("NOMBRE_PERSONA")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NOMBRE_USUARIO")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TIPO_USUARIO")
+                    b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios");
+                    b.ToTable("CatalogoJuegos");
+                });
+
+            modelBuilder.Entity("TPT_JUEGOS.Models.Juego", b =>
+                {
+                    b.Property<int>("Id_JUEGO")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_JUEGO"));
+
+                    b.Property<string>("CODIGO_JUEGO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JUEGO_ACTIVO")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NOMBRE_IMAGEN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NOMBRE_JUEGO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id_JUEGO");
+
+                    b.ToTable("Juegos");
                 });
 #pragma warning restore 612, 618
         }

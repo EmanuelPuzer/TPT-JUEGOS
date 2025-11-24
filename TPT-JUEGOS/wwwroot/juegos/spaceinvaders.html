@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Space Invaders - Mini</title>
+<style>
+  :root{
+    --bg:#071021;
+    --player:#66ffcc;
+    --invader:#ff6b6b;
+    --bullet:#fff;
+    --hud:#dfe7ff;
+    --shield:#6b8cff;
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(ellipse at 10% 10%, rgba(255,255,255,0.02), transparent 10%),
+      radial-gradient(ellipse at 90% 80%, rgba(255,255,255,0.01), transparent 10%),
+      var(--bg);
+    color:var(--hud);
+  }
+  .wrap{
+    width:900px;
+    max-width:95vw;
+    margin:24px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  h1{font-size:18px;margin:0;color:var(--hud);}
+  .controls{font-size:13px;opacity:0.9}
+  canvas{
+    width:100%;height:auto;border-radius:8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 30%), rgba(0,0,0,0.15);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  .hud{
+    display:flex;justify-content:space-between;align-items:center;font-size:14px;
+  }
+  .center{
+    display:flex;gap:10px;align-items:center;
+  }
+  button {
+    background:#0f1724;color:var(--hud);border:1px solid rgba(255,255,255,0.04);
+    padding:6px 10px;border-radius:6px;cursor:pointer;
+  }
+  footer{font-size:12px;color:rgba(223,231,255,0.6);margin-top:6px}
+  @media (max-width:520px){
+    h1{font-size:16px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Space Invaders - Mini</h1>
+      <div class="controls">← → / A D = mover · Bar/Space = disparo · R = reiniciar</div>
+    </header>
+
+    <canvas id="game" width="900" height="600"></canvas>
+
+    <div class="hud">
+      <div class="center"><strong>Puntos:</strong>&nbsp;<span id="score">0</span></div>
+      <div class="center"><strong>Vidas:</strong>&nbsp;<span id="lives">3</span></div>
+      <div class="center"><strong>Nivel:</strong>&nbsp;<span id="level">1</span></div>
+      <div><button id="restart">Reiniciar</button></div>
+    </div>
+
+    <footer>Hecho con &lt;3 — código abierto y editable.</footer>
+  </div>
+
+<script>
+/*
+  Space Invaders - Mini
+  - Un solo archivo, sin dependencias.
+  - Controles: flechas / A D, espacio para disparar. R para reiniciar.
+  - Tiene: jugador, disparos, invasores en formación, colisiones, niveles, sonido simple.
+*/
+
+(() => {
+  // Canvas y context
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  // HUD
+  const scoreEl = document.getElementById('score');
+  const livesEl = document.getElementById('lives');
+  const levelEl = document.getElementById('level');
+  const restartBtn = document.getElementById('restart');
+
+  // Tamaño lógico (canvas resolution)
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Estado del juego
+  let keys = {};
+  let bullets = [];        // disparos del jugador
+  let invaderBullets = []; // disparos de los invasores
+  let invaders = [];       // arreglo 2D o plano de invasores
+  let shields = [];        // protecciones
+  let lastTimestamp = 0;
+  let gameOver = false;
+  let level = 1;
+  let score = 0;
+  let lives = 3;
+  let invaderDirection = 1; // 1 => derecha, -1 => izquierda
+  let invaderSpeed = 30; // px por segundo, se multiplica por nivel
+  let invaderDrop = 28; // cuanto bajan al tocar borde
+  let invaderMoveTimer = 0;
+  let invaderMoveInterval = 0.8; // segundos entre pasos (se reduce con nivel)
+  let invaderStep = 10;
+  let player;
+  let audioCtx = null;
+
+  // Sonidos simples con WebAudio (beeps)
+  function initAudio(){
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e){ audioCtx = null; }
+  }
+  function beep(freq=440,duration=0.08, type='sine'){
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    o.stop(audioCtx.currentTime + duration + 0.02);
+  }
+
+  // Utilidades
+  function rand(min, max){ return Math.random()*(max-min)+min; }
+  function rectsIntersect(a, b){
+    return !(a.x+b.w < b.x || a.x > b.x+b.w || a.y+b.h < b.y || a.y > b.y+b.h);
+  }
+
+  // Player
+  function createPlayer(){
+    return {
+      w: 60,
+      h: 18,
+      x: (W-60)/2,
+      y: H - 60,
+      speed: 320, // px/sec
+      cooldown: 0 // para controlar disparo
+    };
+  }
+
+  // Create invaders formation
+  function createInvaders(rows=4, cols=10){
+    invaders = [];
+    const marginX = 60;
+    const marginTop = 80;
+    const spacingX = (W - marginX*2) / cols;
+    const spacingY = 46;
+    for (let r=0; r<rows; r++){
+      for (let c=0; c<cols; c++){
+        invaders.push({
+          row:r, col:c,
+          x: marginX + c*spacingX + spacingX/2 - 20,
+          y: marginTop + r*spacingY,
+          w: 40,
+          h: 28,
+          alive: true,
+          anim: 0
+        });
+      }
+    }
+  }
+
+  // Shields
+  function createShields(){
+    shields = [];
+    const shieldW = 80;
+    const shieldH = 40;
+    const positions = [W*0.2, W*0.45, W*0.7];
+    for (let x of positions){
+      shields.push({
+        x: x - shieldW/2,
+        y: H - 150,
+        w: shieldW,
+        h: shieldH,
+        hp: 6 // se degrada con impactos
+      });
+    }
+  }
+
+  // Reset / nuevo juego / siguiente nivel
+  function resetGame(nextLevel=false){
+    if (!nextLevel){
+      level = 1;
+      score = 0;
+      lives = 3;
+    } else {
+      level++;
+    }
+    player = createPlayer();
+    bullets = [];
+    invaderBullets = [];
+    invaderDirection = 1;
+    invaderSpeed = 30 + (level-1)*8;
+    invaderMoveInterval = Math.max(0.18, 0.8 - (level-1)*0.08);
+    createInvaders(3 + Math.min(4, level), 10);
+    createShields();
+    gameOver = false;
+    updateHUD();
+  }
+
+  // HUD
+  function updateHUD(){
+    scoreEl.textContent = score;
+    livesEl.textContent = lives;
+    levelEl.textContent = level;
+  }
+
+  // Input
+  window.addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    if (e.key === ' ' || e.code === 'Space') e.preventDefault();
+    if (e.key.toLowerCase() === 'r') {
+      initAudio();
+      resetGame(false);
+    }
+  });
+  window.addEventListener('keyup', e => {
+    keys[e.key.toLowerCase()] = false;
+  });
+
+  // Disparar jugador
+  function playerShoot(){
+    if (player.cooldown > 0) return;
+    bullets.push({
+      x: player.x + player.w/2 - 3,
+      y: player.y - 8,
+      w: 6,
+      h: 12,
+      speed: 540
+    });
+    player.cooldown = 0.28; // segundos entre disparos
+    beep(880, 0.06, 'sawtooth');
+  }
+
+  // Disparos invasores
+  function invadersShoot(){
+    // elegir invasores vivos por columna abajo hacia arriba
+    const cols = {};
+    invaders.forEach(inv=>{
+      if (!inv.alive) return;
+      if (!cols[inv.col] || inv.row > cols[inv.col].row) cols[inv.col] = inv;
+    });
+    const shooters = Object.values(cols);
+    if (shooters.length === 0) return;
+    // probabilidad de disparo aumenta con nivel
+    if (Math.random() < 0.03 + level*0.01){
+      const shooter = shooters[Math.floor(Math.random()*shooters.length)];
+      invaderBullets.push({
+        x: shooter.x + shooter.w/2 - 3,
+        y: shooter.y + shooter.h + 6,
+        w: 6, h: 12,
+        speed: 220 + level*20
+      });
+      beep(220, 0.12, 'triangle');
+    }
+  }
+
+  // Update
+  function update(dt){
+    if (gameOver) return;
+
+    // Player movement
+    let move = 0;
+    if (keys['arrowleft'] || keys['a']) move -= 1;
+    if (keys['arrowright'] || keys['d']) move += 1;
+    player.x += move * player.speed * dt;
+    player.x = Math.max(8, Math.min(W-player.w-8, player.x));
+
+    // Shooting
+    if ((keys[' '] || keys['space'] || keys['k']) && player.cooldown <= 0) {
+      playerShoot();
+    }
+    if (player.cooldown > 0) player.cooldown -= dt;
+
+    // Update bullets
+    for (let i=bullets.length-1;i>=0;i--){
+      bullets[i].y -= bullets[i].speed * dt;
+      if (bullets[i].y + bullets[i].h < 0) bullets.splice(i,1);
+    }
+    for (let i=invaderBullets.length-1;i>=0;i--){
+      invaderBullets[i].y += invaderBullets[i].speed * dt;
+      if (invaderBullets[i].y > H) invaderBullets.splice(i,1);
+    }
+
+    // Invader movement: step based so se siente clásico
+    invaderMoveTimer += dt;
+    if (invaderMoveTimer >= invaderMoveInterval){
+      invaderMoveTimer = 0;
+      // comprobar borde
+      let leftMost = Infinity, rightMost = -Infinity;
+      invaders.forEach(inv=>{ if (inv.alive){ leftMost = Math.min(leftMost, inv.x); rightMost = Math.max(rightMost, inv.x + inv.w); }});
+      if (leftMost === Infinity){
+        // sin invasores => victoria de nivel
+        score += 200 * level;
+        initAudio();
+        beep(1200, 0.16, 'sine');
+        resetGame(true);
+        return;
+      }
+      if (rightMost + invaderStep*invaderDirection > W-8 || leftMost + invaderStep*invaderDirection < 8){
+        // invertir y bajar
+        invaderDirection *= -1;
+        invaders.forEach(inv => { inv.y += invaderDrop; });
+      } else {
+        invaders.forEach(inv => { inv.x += invaderStep * invaderDirection; inv.anim = (inv.anim+1)%2; });
+      }
+      // disparo chance
+      invadersShoot();
+    }
+
+    // Colisiones: balas del jugador vs invasores
+    for (let bi = bullets.length-1; bi>=0; bi--){
+      const b = bullets[bi];
+      let hit = false;
+      // contra invasores
+      for (let ii=0; ii<invaders.length; ii++){
+        const inv = invaders[ii];
+        if (!inv.alive) continue;
+        const invRect = {x:inv.x, y:inv.y, w:inv.w, h:inv.h};
+        if (rectsIntersect(b, invRect)){
+          inv.alive = false;
+          bullets.splice(bi,1);
+          score += 10 + (inv.row*2);
+          initAudio();
+          beep(1000 - inv.row*60, 0.06, 'square');
+          hit = true;
+          break;
+        }
+      }
+      if (hit) continue;
+      // contra shields
+      for (let si=0; si<shields.length; si++){
+        const s = shields[si];
+        if (s.hp <= 0) continue;
+        const sRect = {x:s.x, y:s.y, w:s.w, h:s.h};
+        if (rectsIntersect(b, sRect)){
+          b.y = -1000; // eliminar
+          s.hp -= 1;
+          bullets.splice(bi,1);
+          initAudio();
+          beep(440, 0.04, 'sine');
+          break;
+        }
+      }
+    }
+
+    // Colisiones: balas invasores vs player / shields
+    for (let bi = invaderBullets.length-1; bi>=0; bi--){
+      const b = invaderBullets[bi];
+      if (rectsIntersect(b, player)){
+        invaderBullets.splice(bi,1);
+        lives -= 1;
+        initAudio();
+        beep(120, 0.18, 'sawtooth');
+        if (lives <= 0){
+          gameOver = true;
+          initAudio();
+          beep(80, 1.2, 'sine');
+        }
+        updateHUD();
+        continue;
+      }
+      for (let si=0; si<shields.length; si++){
+        const s = shields[si];
+        if (s.hp <= 0) continue;
+        const sRect = {x:s.x, y:s.y, w:s.w, h:s.h};
+        if (rectsIntersect(b, sRect)){
+          invaderBullets.splice(bi,1);
+          s.hp -= 1;
+          initAudio();
+          beep(220, 0.06, 'triangle');
+          break;
+        }
+      }
+    }
+
+    // Colisiones: invasores que llegan abajo => game over parcial
+    let invasionReached = invaders.some(inv => inv.alive && inv.y + inv.h >= player.y - 20);
+    if (invasionReached){
+      lives = 0;
+      gameOver = true;
+      updateHUD();
+    }
+
+    updateHUD();
+  }
+
+  // Draw
+  function draw(){
+    // fondo estrellado sencillo
+    ctx.clearRect(0,0,W,H);
+    // estrellas
+    for (let i=0;i<120;i++){
+      const sx = (i*47) % W;
+      const sy = (i*97) % H;
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.03 + ((i%7)/60)) + ')';
+      ctx.fillRect(sx, sy, (i%3===0?2:1), (i%5===0?2:1));
+    }
+
+    // player
+    ctx.save();
+    // nave como triángulo con "cabina"
+    ctx.translate(player.x + player.w/2, player.y + player.h/2);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--player').trim() || '#66ffcc';
+    ctx.beginPath();
+    ctx.moveTo(-player.w/2, player.h/2);
+    ctx.lineTo(0, -player.h/1.2);
+    ctx.lineTo(player.w/2, player.h/2);
+    ctx.closePath();
+    ctx.fill();
+    // cabina
+    ctx.fillStyle = 'rgba(10,10,10,0.2)';
+    ctx.fillRect(-player.w*0.16, -6, player.w*0.32, 8);
+    ctx.restore();
+
+    // bullets jugador
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bullet').trim() || '#fff';
+    bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+
+    // invader bullets
+    ctx.fillStyle = '#ffd';
+    invaderBullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+
+    // invaders
+    invaders.forEach(inv => {
+      if (!inv.alive) {
+        // pequeño efecto de ceniza
+        return;
+      }
+      ctx.save();
+      ctx.translate(inv.x, inv.y);
+      // cuerpo
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--invader').trim() || '#ff6b6b';
+      ctx.beginPath();
+      // forma pixelada simple
+      const w = inv.w, h = inv.h;
+      ctx.rect(0,0,w,h*0.6);
+      ctx.fill();
+      // "ojos"
+      ctx.fillStyle = '#111';
+      ctx.fillRect(w*0.18, h*0.12, 6, 6);
+      ctx.fillRect(w*0.58, h*0.12, 6, 6);
+      ctx.restore();
+    });
+
+    // shields
+    shields.forEach(s => {
+      if (s.hp <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0.12, s.hp/6);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--shield').trim() || '#6b8cff';
+      // forma con muescas según hp
+      ctx.beginPath();
+      ctx.rect(s.x, s.y, s.w, s.h);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // HUD overlay
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    ctx.fillRect(6,6,220,34);
+    ctx.font = '14px system-ui';
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillText('Space Invaders - Mini', 14, 30);
+
+    // Game over overlay
+    if (gameOver){
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 44px system-ui';
+      ctx.fillText('GAME OVER', W/2, H/2 - 10);
+      ctx.font = '20px system-ui';
+      ctx.fillText('Presioná R para reiniciar', W/2, H/2 + 28);
+      ctx.textAlign = 'start';
+    }
+  }
+
+  // Loop principal
+  function loop(ts){
+    if (!lastTimestamp) lastTimestamp = ts;
+    const dt = Math.min(0.05, (ts - lastTimestamp)/1000);
+    lastTimestamp = ts;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // Start
+  resetGame(false);
+  requestAnimationFrame(loop);
+
+  // Reiniciar desde el botón
+  restartBtn.addEventListener('click', () => {
+    initAudio();
+    resetGame(false);
+  });
+
+  // Preferencia para activar audio cuando usuario interactúa por primera vez
+  window.addEventListener('click', () => initAudio(), {once:true});
+  window.addEventListener('keydown', () => initAudio(), {once:true});
+
+  // Mejora incremental: ajustar tamaño de canvas según pixel ratio para nitidez
+  function adjustCanvasResolution(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  adjustCanvasResolution();
+  window.addEventListener('resize', adjustCanvasResolution);
+
+})();
+</script>
+</body>
+</html>

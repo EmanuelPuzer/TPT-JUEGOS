@@ -11,8 +11,8 @@ using TPT_JUEGOS.Context;
 namespace TPT_JUEGOS.Migrations
 {
     [DbContext(typeof(UsuariosDatabaseContext))]
-    [Migration("20251110233152_BaseDatos")]
-    partial class BaseDatos
+    [Migration("20251124174724_AgregandoImagen")]
+    partial class AgregandoImagen
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,34 @@ namespace TPT_JUEGOS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("TPT_JUEGOS.Models.Juego", b =>
+                {
+                    b.Property<int>("Id_JUEGO")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_JUEGO"));
+
+                    b.Property<string>("CODIGO_JUEGO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JUEGO_ACTIVO")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NOMBRE_IMAGEN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NOMBRE_JUEGO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id_JUEGO");
+
+                    b.ToTable("Juegos");
+                });
+
             modelBuilder.Entity("TPT_JUEGOS.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")
@@ -32,8 +60,9 @@ namespace TPT_JUEGOS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CONTRASENA_USUARIO")
-                        .HasColumnType("int");
+                    b.Property<string>("CONTRASENA_USUARIO")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CORREO_USUARIO")
                         .IsRequired()
@@ -49,6 +78,9 @@ namespace TPT_JUEGOS.Migrations
                     b.Property<string>("NOMBRE_USUARIO")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TIPO_USUARIO")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

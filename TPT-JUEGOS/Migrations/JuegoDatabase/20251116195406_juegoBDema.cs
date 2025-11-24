@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace TPT_JUEGOS.Migrations
+namespace TPT_JUEGOS.Migrations.JuegoDatabase
 {
     /// <inheritdoc />
-    public partial class juego : Migration
+    public partial class juegoBDema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
